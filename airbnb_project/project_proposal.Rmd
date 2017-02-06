@@ -9,7 +9,8 @@ output: html_document
 library(dplyr)
 library(knitr)
 
-df.var <- read.table('data\\variables.csv',header=TRUE,sep=",")
+df.var <- read.table('data\\variables.csv',header=TRUE,sep=',')
+df.data <- read.table('data\\listings.csv',header=TRUE,sep=',')
 ```
 
 <!-- your names;
