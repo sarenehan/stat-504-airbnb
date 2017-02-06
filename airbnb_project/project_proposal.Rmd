@@ -4,3 +4,22 @@ author: "Stewart Renehan, Steven Hwang, Yejiong Zhu"
 date: "2/5/2017"
 output: html_document
 ---
+<!-- your names;
+the title of the project;
+a brief description of the research question, identifying whether it has inferential or predictive objectives;
+a brief but clear and complete description of the associated data set that includes:
+data collection process (e.g., describe the sample or experimental design),
+units of measurement for all variables,
+data structure (e.g., if your data are on 50 U.S. states with the sample size of 354, explain where the number 354 is coming from);
+a clear identification of the outcome variable;
+a brief description of any unusual methodological aspects that are already apparent (e.g., homoscedasticity, outliers, or dependent data structure);
+a few key references.
+The entire project proposal, including references, should not exceed one double-sided page in a normal size font (12pts).  --> 
+
+<style type="text/css">
+body{ /* Normal  */
+   font-size: 12px;
+}
+</style>
+
+
