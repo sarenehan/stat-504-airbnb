@@ -1,0 +1,6 @@
+---
+title: 'STAT 504 Project Proposal: Airbnb Prices in Amsterdam'
+author: "Stewart Renehan, Steven Hwang, Yejiong Zhu"
+date: "2/5/2017"
+output: html_document
+---
