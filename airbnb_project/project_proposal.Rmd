@@ -4,6 +4,14 @@ author: "Stewart Renehan, Steven Hwang, Yejiong Zhu"
 date: "2/5/2017"
 output: html_document
 ---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(knitr)
+
+df.var <- read.table('data\\variables.csv',header=TRUE,sep=",")
+```
+
 <!-- your names;
 the title of the project;
 a brief description of the research question, identifying whether it has inferential or predictive objectives;
@@ -22,4 +30,6 @@ body{ /* Normal  */
 }
 </style>
 
-
+## Variables
+The data has 95 variables with a sample size of 13849. The sample size of 13849 is the number of Airbnb listings currently active in Amsterdam, Netherlands. Of those 95 variables, 24 were selected as covariates for the regression model and analysis. 
+`r kable(df.var)`
