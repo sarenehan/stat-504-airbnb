@@ -22,4 +22,5 @@
 "communication review score","1-10"
 "location review score","1-10"
 "value review score","1-10"
-"reviews per month","1-10"
+"reviews per month","reviews/month"
+"availability for the year","days"

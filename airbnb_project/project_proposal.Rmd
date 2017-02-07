@@ -6,11 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-library(dplyr);
-library(knitr);
+library(dplyr)
+library(knitr)
 
-df.var <- read.table('/Users/stewart/projects/stat-504-airbnb/data/variables.csv',header=TRUE,sep=',');
-df.data <- read.csv('/Users/stewart/projects/stat-504-airbnb/data/listings.csv',header=TRUE);
+df.var <- read.csv('variables.csv',header=TRUE,sep=',')
+df.data <- read.csv('listings.csv',header=TRUE,sep=',')
 ```
 
 <!-- your names;
@@ -34,9 +34,12 @@ body{ /* Normal  */
 ## Research Question
 What are the strongest indicators of Airbnb rental prices in Amsterdam? This research question is inferential; we would like to learn which attributes of Airbnb rentals are the strongest indicators of price. Though we cannot make causal inferences due to the observational nature of the data, this question interests us as it enables an understanding of what visitors of Amsterdam value in accommodation.
 
-## Variables
-The data has 95 variables with a sample size of 13849. The sample size of 13849 is the number of Airbnb listings currently active in Amsterdam, Netherlands. Of those 95 variables, 24 were selected as covariates for the regression model and analysis. 
-`r kable(df.var)`
+## Data and Variables
+The data was collected using a combination of web scrapers and scripts to pull data of current listings up to 7/4/2016 on Airbnb for the city of Amsterdam, Netherlands. All of the data collected is publicly available data on the Airbnb site. The data has 95 variables with a sample size of 13849. The sample size of 13849, which is the number of Airbnb listings currently active in Amsterdam, Netherlands up to 7/4/2016. Of those 95 variables, 25 were selected as covariates for the regression model and analysis. 
+`r kable(df.var, col.names = c("Variable","Unit of Measure"), caption="Table of the covariates and their units.")`
 
 ## Outcome Variable
 The outcome variable is the list price per night of Airbnb listings in Amsterdam. It should be noted that list price per night does not necessarily denote value, as overpriced units may not be rented out. Thus, analysis of the power of the selected variables to predict list price will not be extended to represent the power to predict value of the units. Nevertheless, Airbnb hosts are likely to charge what their places are worth so the analysis of the variables' ability to predict list price per night remains interesting and relevant.
+
+## Methodological Aspects
+After analyzing the data there are some methodological aspects that need to be addressed. The overall rating variables is dependent on the individual ratings. This is due to the fact that the overall rating is an scale additive combination of the individual ratings. 
