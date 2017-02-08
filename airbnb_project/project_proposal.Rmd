@@ -2,6 +2,7 @@
 title: 'STAT 504 Project Proposal: Airbnb Prices in Amsterdam'
 author: "Stewart Renehan, Steven Hwang, Yejiong Zhu"
 date: "2/8/2017"
+bibliography: bibliography.bib
 output: html_document
 ---
 
@@ -10,7 +11,8 @@ library(dplyr)
 library(knitr)
 #Just set your working directory when you are using it.
 #setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
-# setwd('/Users/stewart/projects/stat-504-airbnb/data/');
+setwd('/Users/stewart/projects/stat-504-airbnb/data/');
+# setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
 df.var <- read.csv('variables.csv',header=TRUE,sep=',')
 df.data <- read.csv('listings.csv',header=TRUE,sep=',')
 ```
@@ -37,7 +39,7 @@ body{ /* Normal  */
 What are the strongest indicators of Airbnb rental prices in Amsterdam? This research question is inferential; we would like to learn which attributes of Airbnb rentals are the strongest indicators of price. Though we cannot make causal inferences due to the observational nature of the data, this question interests us as it enables an understanding of what visitors of Amsterdam value in accommodation.
 
 ## Data and Variables
-The data was collected using a combination of web scrapers and scripts to pull data of current listings up to 7/4/2016 on Airbnb for the city of Amsterdam, Netherlands. All of the data collected is publicly available data on the Airbnb site. The data has 95 variables with a sample size of 13849. The sample size of 13849, which is the number of Airbnb listings currently active in Amsterdam, Netherlands up to 7/4/2016. Of those 95 variables, 25 were selected as covariates for the regression model and analysis. 
+The data obtained from Inside Airbnb. Inside Airbnb collected the data using a combination of web scrapers and scripts to pull data of current listings up to 7/4/2016 on Airbnb for the city of Amsterdam, Netherlands [@airbnb]. All of the data collected is publicly available data on the Airbnb site. The data has 95 variables with a sample size of 13849. The sample size of 13849, which is the number of Airbnb listings currently active in Amsterdam, Netherlands up to 7/4/2016. Of those 95 variables, 25 were selected as covariates for the regression model and analysis. 
 `r kable(df.var, col.names = c("Variable","Unit of Measure"), caption="Table of the covariates and their units.")`
 
 ## Outcome Variable
@@ -45,3 +47,5 @@ The outcome variable is the list price per night of Airbnb listings in Amsterdam
 
 ## Methodological Aspects
 After analyzing the data there are some methodological aspects that need to be addressed. The overall rating variables is dependent on the individual ratings. This is due to the fact that the overall rating is an scale additive combination of the individual ratings. In addition, we will need to deal with categorical variables. Our plan is to featurize the categorical variables such that for each distinct value of a categorical variable, we will genenerate a column whose value is either 0 or 1. 
+
+## References
