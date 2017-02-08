@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(dplyr)
 library(knitr)
-
+setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
 df.var <- read.csv('variables.csv',header=TRUE,sep=',')
 df.data <- read.csv('listings.csv',header=TRUE,sep=',')
 ```
