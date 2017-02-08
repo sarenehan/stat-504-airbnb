@@ -1,7 +1,7 @@
 ---
 title: 'STAT 504 Project Proposal: Airbnb Prices in Amsterdam'
 author: "Stewart Renehan, Steven Hwang, Yejiong Zhu"
-date: "2/5/2017"
+date: "2/8/2017"
 output: html_document
 ---
 
@@ -10,6 +10,7 @@ library(dplyr)
 library(knitr)
 #Just set your working directory when you are using it.
 #setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
+# setwd('/Users/stewart/projects/stat-504-airbnb/data/');
 df.var <- read.csv('variables.csv',header=TRUE,sep=',')
 df.data <- read.csv('listings.csv',header=TRUE,sep=',')
 ```
@@ -43,4 +44,4 @@ The data was collected using a combination of web scrapers and scripts to pull d
 The outcome variable is the list price per night of Airbnb listings in Amsterdam. It should be noted that list price per night does not necessarily denote value, as overpriced units may not be rented out. Thus, analysis of the power of the selected variables to predict list price will not be extended to represent the power to predict value of the units. Nevertheless, Airbnb hosts are likely to charge what their places are worth so the analysis of the variables' ability to predict list price per night remains interesting and relevant.
 
 ## Methodological Aspects
-After analyzing the data there are some methodological aspects that need to be addressed. The overall rating variables is dependent on the individual ratings. This is due to the fact that the overall rating is an scale additive combination of the individual ratings. 
+After analyzing the data there are some methodological aspects that need to be addressed. The overall rating variables is dependent on the individual ratings. This is due to the fact that the overall rating is an scale additive combination of the individual ratings. In addition, we will need to deal with categorical variables. Our plan is to featurize the categorical variables such that for each distinct value of a categorical variable, we will genenerate a column whose value is either 0 or 1. 
