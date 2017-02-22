@@ -50,7 +50,7 @@ for (var in variables.numeric) {
 
 # Remove the outliers
 # Remove 2702 rows with null values
-nrow(data)  # 13849
+nrow(data)  # 13849.
 for (var in variables) {
   data = data[!is.na(data[,var]),]
 }

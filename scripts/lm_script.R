@@ -1,8 +1,10 @@
 library(ggmap)
 library(ggplot2)
 library(dplyr)
+library(faraway)
 
-setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
+# setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
+setwd('/Users/stewart/projects/stat-504-airbnb/data/');
 
 df.data <- read.csv('listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
 
@@ -14,15 +16,86 @@ df.data <- select(df.data, id, price, host_response_rate, host_acceptance_rate, 
                   review_scores_cleanliness, review_scores_communication, review_scores_location,
                   review_scores_value, reviews_per_month)
 
-#cleaning data
-df.data$price <- as.numeric(substring(df.data$price,2))
-df.data$host_response_rate <- as.numeric(ifelse(df.data$host_response_rate=="N/A",0,substr(df.data$host_response_rate, 1, nchar(df.data$host_response_rate)-1)))
-df.data$host_acceptance_rate <- as.numeric(ifelse(df.data$host_acceptance_rate=="N/A",0,substr(df.data$host_acceptance_rate, 1, nchar(df.data$host_acceptance_rate)-1)))
-df.data$host_is_superhost[df.data$host_is_superhost==""] <- "f"
+## cleaning data
+# Coerce columns into proper types
+df.data$price <- as.numeric(gsub(",", "", substring(df.data$price,2)))
+nrow(df.data)  # 13849
+df.data = df.data[!df.data$host_response_rate == "N/A",]
+nrow(df.data)  # 11580
+df.data$host_response_rate <- as.numeric(substr(df.data$host_response_rate, 1, nchar(df.data$host_response_rate)-1))
+df.data = df.data[!df.data$host_acceptance_rate == "N/A",]
+nrow(df.data)  # 11141 
+df.data$host_acceptance_rate <- as.numeric(substr(df.data$host_acceptance_rate, 1, nchar(df.data$host_acceptance_rate)-1))
+df.data = df.data[!df.data$host_is_superhost == "",]
+nrow(df.data)  # 11105
 df.data$host_is_superhost <- factor(df.data$host_is_superhost)
+df.data = df.data[!df.data$neighbourhood_cleansed == "",]
+nrow(df.data)  # 11105
 df.data$neighbourhood_cleansed <- factor(df.data$neighbourhood_cleansed)
+df.data = df.data[!df.data$property_type == "",]
+nrow(df.data)  # 11105
 df.data$property_type <- factor(df.data$property_type)
+df.data = df.data[!df.data$room_type == "",]
+nrow(df.data)  # 11105
 df.data$room_type <- factor(df.data$room_type)
 
+
+# Remove data with null values
+for (var in names(df.data)) {
+  df.data = df.data[!is.na(df.data[,var]),]
+}
+nrow(df.data)  # 9574
+
+summary(df.data$property_type)
+# These types have less than 5 counts
+property_types_to_remove = c(
+  "Bungalow", "Chalet", "Earth House", "Dorm", "Hut", "Tent", "Yurt"
+)
+df.data = df.data[!df.data$property_type %in% property_types_to_remove,]
+nrow(df.data)  # 9562
+
+
+# Build model
 lm.airbnb <- lm(price~., data=df.data[,-1])
 summary(lm.airbnb)
+plot(lm.airbnb$fitted.values, lm.airbnb$residuals) # Clear violation of constant variance
+
+# Remove outliers
+model.influence = influence(lm.airbnb)
+halfnorm(model.influence$hat,
+         xlim=c(-0.1,4.8),
+         ylab="Leverages")
+title(main="Half-Normalquantileplotforleverages")
+max(model.influence$hat) # 0.0997
+# No obvious leverage points
+
+# Cooks distances
+cook = cooks.distance(lm.airbnb)
+halfnorm(cook) # 422, 221
+# 422 is removed because it only has 0.11 removed per month and costs $1307 per night.
+# 221 is removed because it only has 1 review and it accomodates 16 but only costs $100.
+bad_ids = c(11946090, 5587500)
+df.data = df.data[!df.data$id %in% bad_ids,]
+lm.airbnb <- lm(price~., data=df.data[,-1])
+cook = cooks.distance(lm.airbnb)
+halfnorm(cook) # 276, 218
+# 276 accommodates 16 but only costs $60, something is wrong
+# 218 sems normal
+df.data = df.data[-276,]
+lm.airbnb <- lm(price~., data=df.data[,-1])
+cook = cooks.distance(lm.airbnb)
+halfnorm(cook) # 317, 868
+# 317 accommodates 16 and only costs 50, something is wrong
+# This is recurring, something is strange
+sum(df.data$accommodates == 16) # 21
+# These are outliers with wrong data.
+df.data = df.data[!df.data$accommodates == 16,]
+nrow(df.data)  # 9538
+
+lm.airbnb <- lm(price~., data=df.data[,-1])
+cook = cooks.distance(lm.airbnb)
+halfnorm(cook) # 354, 509
+# These two are both > $400, but seem normal. I am stopping here.
+
+summary(lm.airbnb)
+plot(lm.airbnb$fitted.values, lm.airbnb$residuals) 
