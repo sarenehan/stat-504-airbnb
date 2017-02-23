@@ -4,7 +4,8 @@ library(dplyr)
 library(faraway)
 
 # setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
-setwd('/Users/stewart/projects/stat-504-airbnb/data/');
+#setwd('/Users/stewart/projects/stat-504-airbnb/data/');
+setwd("~/Documents/courses/504/stat-504-airbnb/data")
 
 df.data <- read.csv('listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
 
@@ -97,5 +98,21 @@ cook = cooks.distance(lm.airbnb)
 halfnorm(cook) # 354, 509
 # These two are both > $400, but seem normal. I am stopping here.
 
+##transformation 
+library('MASS')
+boxcox(lm.airbnb)
+##we can choose lambda =0 and transform price to log(price)
+lm.airbnb=lm(log(price)~.,data=df.data[,-1])
 summary(lm.airbnb)
-plot(lm.airbnb$fitted.values, lm.airbnb$residuals) 
+plot(lm.airbnb,which=1) 
+
+##variable selection
+step(lm.airbnb)
+##from the output of step, we exclude beds, host_acceptance_rate,review_scores_checkin, review_scores_communication.
+
+drop=c('beds','host_acceptance_rate','review_scores_checkin','review_scores_communication')
+df.data.drop=df.data[,!names(df.data)%in%drop]
+lm.airbnd=lm(log(price)~.,data=df.data.drop)
+anova(lm.airbnd)
+plot(lm.airbnb,which=1)
+sumary(lm.airbnb)
