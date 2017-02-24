@@ -98,6 +98,13 @@ cook = cooks.distance(lm.airbnb)
 halfnorm(cook) # 354, 509
 # These two are both > $400, but seem normal. I am stopping here.
 
+plot(lm.airbnb, which=1)
+plot(lm.airbnb$fitted.values,
+     lm.airbnb$residuals,
+     xlab="Fitted Values",
+     ylab="Residuals",
+     main="Residuals vs Fitted Values") # Clear violation of constant variance
+
 ##transformation 
 library('MASS')
 boxcox(lm.airbnb)
@@ -112,7 +119,45 @@ step(lm.airbnb)
 
 drop=c('beds','host_acceptance_rate','review_scores_checkin','review_scores_communication')
 df.data.drop=df.data[,!names(df.data)%in%drop]
-lm.airbnd=lm(log(price)~.,data=df.data.drop)
+lm.airbnd=lm(log(price)~.,data=df.data.drop[,-1])
 anova(lm.airbnd)
 plot(lm.airbnb,which=1)
-sumary(lm.airbnb)
+summary(lm.airbnb)
+
+# Feature importances 
+adjusted_r_squared_full = summary(lm.airbnd)$adj.r.squared
+features.importances = c()
+for (idx in seq(ncol(df.data.drop) - 2)) {
+  model.reduced = lm(log(price)~., data=df.data.drop[,-c(1, idx+2)]);
+  features.importances = c(features.importances,
+                           adjusted_r_squared_full - summary(model.reduced)$adj.r.squared);
+}
+feature_names = c(
+  "Response Rate",
+  "Superhost",
+  "Listing Count",
+  "Neighborhood",
+  "Property Type",
+  "Room Type",
+  "Accommodates",
+  "Bathrooms",
+  "Bedrooms",
+  "Guests Incl.",
+  "Availability",
+  "No. Reviews",
+  "Accuracy",
+  "Cleanliness",
+  "Location Score",
+  "Value Score",
+  "Reviews / Month"
+)
+barplot(features.importances, names.arg = feature_names,
+        ylab = "Improvement to Adj R-Squared",
+        main = "Feature Importance",las=3)
+
+
+
+
+
+
+
