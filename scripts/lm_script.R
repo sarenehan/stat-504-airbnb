@@ -10,36 +10,60 @@ setwd("~/Documents/courses/504/stat-504-airbnb/data")
 df.data <- read.csv('listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
 
 #Reducing to variables of interests
-df.data <- select(df.data, id, price, host_response_rate, host_acceptance_rate, host_is_superhost, 
-                  host_listings_count, neighbourhood_cleansed, property_type, room_type,
-                  accommodates, bathrooms, bedrooms, beds, guests_included, 
-                  availability_365, number_of_reviews, review_scores_accuracy, review_scores_checkin,
-                  review_scores_cleanliness, review_scores_communication, review_scores_location,
-                  review_scores_value, reviews_per_month)
+df.data <- dplyr::select(df.data, price, host_is_superhost, host_has_profile_pic, host_identity_verified, 
+                  neighbourhood_cleansed, property_type, room_type, accommodates, bathrooms, bedrooms, beds, bed_type,
+                  amenities, guests_included, minimum_nights)
 
 ## cleaning data
 # Coerce columns into proper types
 df.data$price <- as.numeric(gsub(",", "", substring(df.data$price,2)))
 nrow(df.data)  # 13849
-df.data = df.data[!df.data$host_response_rate == "N/A",]
-nrow(df.data)  # 11580
-df.data$host_response_rate <- as.numeric(substr(df.data$host_response_rate, 1, nchar(df.data$host_response_rate)-1))
-df.data = df.data[!df.data$host_acceptance_rate == "N/A",]
-nrow(df.data)  # 11141 
-df.data$host_acceptance_rate <- as.numeric(substr(df.data$host_acceptance_rate, 1, nchar(df.data$host_acceptance_rate)-1))
-df.data = df.data[!df.data$host_is_superhost == "",]
-nrow(df.data)  # 11105
+
+df.data <- df.data[!df.data$host_is_superhost == "",]
+nrow(df.data)  # 13813
+
 df.data$host_is_superhost <- factor(df.data$host_is_superhost)
+df.data <- df.data[!df.data$host_has_profile_pic=="",]
+nrow(df.data) #13813
+
+df.data$host_has_profile_pic <- factor(df.data$host_has_profile_pic)
+df.data <- df.data[!df.data$host_identity_verified=="",]
+nrow(df.data) #13813
+
+df.data$host_identity_verified <- factor(df.data$host_identity_verified)
 df.data = df.data[!df.data$neighbourhood_cleansed == "",]
-nrow(df.data)  # 11105
+nrow(df.data)  # 13813
+
 df.data$neighbourhood_cleansed <- factor(df.data$neighbourhood_cleansed)
 df.data = df.data[!df.data$property_type == "",]
-nrow(df.data)  # 11105
+nrow(df.data)  # 13813
+
 df.data$property_type <- factor(df.data$property_type)
+
 df.data = df.data[!df.data$room_type == "",]
-nrow(df.data)  # 11105
+nrow(df.data)  # 13813
 df.data$room_type <- factor(df.data$room_type)
 
+df.data = df.data[!df.data$bed_type == "",]
+nrow(df.data)  # 13813
+df.data$bed_type <- factor(df.data$bed_type)
+
+#Aemnities extraction
+#Wireless Internet
+df.data$wifi <- 'f'
+df.data$wifi[grep("Wireless Internet", df.data$amenities, ignore.case = TRUE)] <- 't'
+df.data$wifi <- factor(df.data$wifi)
+#Free Parking on Premises
+df.data$parking <- 'f'
+df.data$parking[grep("Free Parking on Premises", df.data$amenities, ignore.case = TRUE)] <- 't'
+df.data$parking <- factor(df.data$parking)
+#Smoking Allowed
+df.data$smoke <- 'f'
+df.data$smoke[grep("Smoking Allowed", df.data$amenities, ignore.case = TRUE)] <- 't'
+df.data$smoke <- factor(df.data$smoke)
+
+#Drop amenities
+df.data <- dplyr::select(df.data, -amenities)
 
 # Remove data with null values
 for (var in names(df.data)) {
