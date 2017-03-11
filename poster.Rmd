@@ -1,0 +1,41 @@
+---
+title: "Project Poster"
+author: "Steven Hwang"
+date: "March 10, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+## Background
+
+## Methodology & Analysis
+
+## Results
+The expected change in log of y with respect to a one-unit increase in x1 holding all other variables at any fixed value
+
+* The results show that most airbnb account settings are significant at the 0.05 level except for bed types and parking. 
+* The variable that had the strongest effect on the price per night is renting out the entire property, with a increase in the price per night by 2.24 times when compared to renting out a shared room while controlling for others.
+* An interesting conclusion found was that smoking did not seem to have an affect on the price per night as the coeffecient is close to 1.
+
+|                          |$\beta$   |exp($\beta$)    | SE    | p-value  |
+|-------------------------|--------|--------------|-------|----------|
+| Intercept               | 2.680  | 14.59       | 0.092 | < 2e-16  |
+| Host is superhost       | 0.070  | 1.07        | 0.009 | 4.86e-14 |
+| Room type: Private      | 0.397  | 1.49        | 0.008 | < 2e-16  |
+| Room type: Entire Place | 0.806  | 2.24        | 0.045 | < 2e-16  |
+| Accomodates             | 0.076  | 1.08        | 0.004 | < 2e-16  |
+| # of Beds               | 0.006  | 1.01        | 0.004 | 0.0984   |
+| Bed type: Couch         | 0.184  | 1.20        | 0.112 | 0.0997   |
+| Bed type: Real Bed      | 0.076  | 1.08        | 0.076 | 0.1208   |
+| Guest included          | 0.015  | 1.02        | 0.003 | 5.75e-07 |
+| Minimum nights          | -0.019 | 0.98        | 0.002 | < 2e-16  |
+| Wifi                    | 0.137  | 1.14        | 0.020 | 2.52e-12 |
+| Parking                 | 0.019  | 1.02        | 0.013 | 0.1415   |
+| Smoking                 | -0.024 | 0.98        | 0.009 | 0.0109   |
+
+## Discussion

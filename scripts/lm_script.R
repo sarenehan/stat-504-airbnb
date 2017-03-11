@@ -4,8 +4,8 @@ library(ggplot2)
 library(dplyr)
 library(faraway)
 
-# setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
-setwd('/Users/stewart/projects/stat-504-airbnb/data/');
+ setwd('D:\\Program File\\Git\\git_projects\\STATS 504\\ProjectProposal\\stat-504-airbnb\\data')
+#setwd('/Users/stewart/projects/stat-504-airbnb/data/');
 # setwd("~/Documents/courses/504/stat-504-airbnb/data")
 
 df.data <- read.csv('listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
@@ -97,6 +97,10 @@ lm.airbnb <- lm(price~., data=df.data)
 summary(lm.airbnb)
 plot(lm.airbnb$fitted.values, lm.airbnb$residuals) # Clear violation of constant variance
 
+df.temp <- data.frame(fitted=lm.airbnb$fitted.values, residuals=lm.airbnb$residuals)
+
+p <- ggplot(df.temp, aes(x=fitted, y=residuals))
+p + stat_binhex(colour="white") + ggtitle("Residuals vs Fitted values plot") + theme(plot.title = element_text(hjust = 0.5))
 # Remove outliers
 # Cooks distances
 cook = cooks.distance(lm.airbnb)
@@ -125,11 +129,14 @@ plot(lm.airbnb$fitted.values,
      main="Residuals vs Fitted Values") # Clear violation of constant variance
 
 ##transformation 
-boxcox(lm.airbnb)
+boxcox(lm.airbnb, lambda = seq(-.5, .5, 1/10))
 ##we can choose lambda =0 and transform price to log(price)
 lm.airbnb=lm(log(price)~.,data=df.data)
 summary(lm.airbnb)
-plot(lm.airbnb,which=1) 
+df.temp <- data.frame(fitted=lm.airbnb$fitted.values, residuals=lm.airbnb$residuals)
+
+p <- ggplot(df.temp, aes(x=fitted, y=residuals))
+p + stat_binhex(colour="white") + ggtitle("Residuals vs Fitted values plot") + theme(plot.title = element_text(hjust = 0.5))
 
 ##variable selection
 step(lm.airbnb)
