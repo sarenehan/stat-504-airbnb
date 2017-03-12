@@ -15,6 +15,180 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Methodology & Analysis
 
+```{r,include=F}
+library(MASS)
+library(ggmap)
+library(ggplot2)
+library(dplyr)
+library(faraway)
+df.data <- read.csv('~/Documents/courses/504/stat-504-airbnb/data/listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
+
+#Reducing to variables of interests
+df.data <- dplyr::select(df.data, price, host_is_superhost, host_has_profile_pic, host_identity_verified, 
+                         neighbourhood_cleansed, property_type, room_type, accommodates, bathrooms, bedrooms, beds, bed_type, amenities, guests_included, minimum_nights, number_of_reviews)
+
+#clean data
+df.data$price <- as.numeric(gsub(",", "", substring(df.data$price,2)))
+nrow(df.data)  # 13849
+
+df.data <- df.data[!df.data$host_is_superhost == "",]
+nrow(df.data)  # 13813
+
+df.data$host_is_superhost <- factor(df.data$host_is_superhost)
+df.data <- df.data[!df.data$host_has_profile_pic=="",]
+nrow(df.data) #13813
+
+df.data$host_has_profile_pic <- factor(df.data$host_has_profile_pic)
+df.data <- df.data[!df.data$host_identity_verified=="",]
+nrow(df.data) #13813
+
+df.data$host_identity_verified <- factor(df.data$host_identity_verified)
+df.data = df.data[!df.data$neighbourhood_cleansed == "",]
+nrow(df.data)  # 13813
+
+df.data$neighbourhood_cleansed <- factor(df.data$neighbourhood_cleansed)
+df.data = df.data[!df.data$property_type == "",]
+nrow(df.data)  # 13813
+
+df.data$property_type <- factor(df.data$property_type)
+
+df.data = df.data[!df.data$room_type == "",]
+nrow(df.data)  # 13813
+df.data$room_type <- factor(df.data$room_type)
+
+df.data = df.data[!df.data$bed_type == "",]
+nrow(df.data)  # 13813
+df.data$bed_type <- factor(df.data$bed_type)
+
+#Aemnities extraction
+#Wireless Internet
+df.data$wifi <- 'f'
+df.data$wifi[grep("Wireless Internet", df.data$amenities, ignore.case = TRUE)] <- 't'
+df.data$wifi <- factor(df.data$wifi)
+#Free Parking on Premises
+df.data$parking <- 'f'
+df.data$parking[grep("Free Parking on Premises", df.data$amenities, ignore.case = TRUE)] <- 't'
+df.data$parking <- factor(df.data$parking)
+#Smoking Allowed
+df.data$smoke <- 'f'
+df.data$smoke[grep("Smoking Allowed", df.data$amenities, ignore.case = TRUE)] <- 't'
+df.data$smoke <- factor(df.data$smoke)
+
+#Drop amenities
+df.data <- dplyr::select(df.data, -amenities)
+
+# Remove data with null values
+for (var in names(df.data)) {
+  df.data = df.data[!is.na(df.data[,var]),]
+}
+nrow(df.data)  # 13767
+
+sum(df.data$number_of_reviews == 0)  # 2451
+# Listings with no reviews have few stays; their prices may not be indicitive of what they are worth.
+df.data = df.data[!df.data$number_of_reviews == 0,]
+nrow(df.data)  # 11316
+#Drop number of reviews
+df.data <- dplyr::select(df.data, -number_of_reviews)
+
+summary(df.data$property_type)
+# These types have less than 5 counts
+property_types_to_remove = c(
+  "Bungalow", "Chalet", "Earth House", "Dorm", "Hut", "Tent", "Yurt"
+)
+df.data = df.data[!df.data$property_type %in% property_types_to_remove,]
+nrow(df.data)  # 11304
+
+# Remove listings with accommodates outliers. 
+df.data <- subset(df.data, !(accommodates > 10 & price < 150))
+nrow(df.data)  # 11295
+```
+
+After some data cleaing, we intend to bulid a regression model to predict house price. Our data frame has 17 varialbes. The first is responce and the others are predictors.
+
+```{r,include=F}
+summary(df.data)
+```
+
+We bulit an original regression model including all predictors and all samples. The residual plot shows there exist some outliers and variance of residuals are not constant. The QQ plot shows our data are not from normal distribution which has no effect on the basis of estimators but influences the tests of significance. Since our rule is to guarantee the high accuracy of prediction, we don't have to pay much attention on the non-normality. 
+
+```{r,echo=F}
+reg1=lm(price~.,data=df.data)
+par(mfrow=c(2,2))
+plot(reg1)
+```
+
+In order to solve the nonconstant variance problem, we should transform our response by using Boxcox. We can choose $\lambda=0$ and transform 'price' into 'log(price)'. Then, we remove outliers based on cook distance and standardized residual.After that, the residual plot shows the variance becomes constant.
+
+```{r,include=F}
+cook=cooks.distance(reg1)
+halfnorm(cook) # 487, 5703
+# 487 is removed because it only has 0.11 removed per month and costs $1307 per night.
+# 5703 is removed because it has a minimum_nights value of 1000
+bad_ids = c(487, 5703)
+df.data = df.data[-bad_ids,]
+
+# Remove points with minimum_nights > 15. These dont fall under the category of short term vacation
+# rental. 
+df.data = df.data[df.data$minimum_nights <= 15,]
+nrow(df.data)  # 11223
+
+reg <- lm(price~., data=df.data)
+cook = cooks.distance(reg)
+halfnorm(cook) # 100, 595
+# 100 seems normal, but cheap.
+# 595 sems normal but more expensive. Stop here
+```
+
+```{r,echo=F,fig.height=3}
+library('MASS')
+boxcox(reg1,lambda = seq(-0.5,0.5,0.01))
+```
+
+```{r,echo=F}
+lm.airbnb=lm(log(price)~.,data=df.data)
+par(mfrow=c(2,2))
+plot(lm.airbnb)
+```
+
+After outliers detection and response transformation, we can bulid a regression model with imporved data. Then we should select some variables which can maxmize the prediction accuracy. Cross validation is a proper approach to achieve this goal. We set the minimum variable number to be 10. Based on the result of our cross validation, we keep 'host_identity_verified','Host_has_profile_pic','Host_is_superhost',
+'Neighbourhood_cleansed','Property_type','Room_type','Accommodates','Bathrooms','Bed_type','Wifi','parking' 10 varialbes. Below is the result of our regression model.
+
+
+```{r,eval=F,echo=F}
+ind=sample(1:11223,7656)
+df.train=df.data[ind,]
+df.test=df.data[-ind,]
+
+num=0
+for(i in 10:16){
+  num=choose(16,i)+num
+}
+var.mat=matrix(c(0),nrow = num,ncol=16)
+num=1
+for(i in 10:16){
+  commat=combn(16,i)
+  for(j in 1: choose(16,i)){
+    var.mat[num,commat[,j]]=rep(1,i)
+    num=num+1
+  }
+}
+score=rep(0,dim(var.mat)[1])
+for(i in 1:dim(var.mat)[1]){
+  l1=lm(log(price)~.,data=df.train[,c(TRUE,var.mat[i,]==1)])
+  pred=predict.lm(l1,newdata = df.test)
+  score[i]=sqrt(mean((df.test$price-exp(pred))^2))
+}
+
+```
+
+```{r,echo=F,warning=F,message=F}
+df.name=c('price','host_identity_verified','host_has_profile_pic','host_is_superhost',
+'neighbourhood_cleansed','property_type','room_type','accommodates','bathrooms','bed_type','wifi','parking' )
+lm.airbnb=lm(log(price)~.,data=df.data[,df.name])
+```
+
+
+
 ## Results
 The expected change in log of y with respect to a one-unit increase in x1 holding all other variables at any fixed value
 
