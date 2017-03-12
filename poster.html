@@ -126,6 +126,7 @@ $(document).ready(function () {
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
+<p>Travelers are increasingly using short term vacation rentals as an alternative to traditional hotels for accomodations. The most popular service for short term vacation rentals is Airbnb, a website that lets anybody rent out their room, apartment, or house. Airbnb’s popularity has created a potential revenue source for property owners. Homeowners with a spare bedroom now have the option to rent it out on their desired timeline. Apartment building owners now have the option to rent units to travelers instead of long term tenants. Central to the decision to become an Airbnb host is the expected revenue. Individuals will only list their properties on Airbnb if they expect to make above a certain amount of money. A model that predicts the rental price of a unit given its attributes can help potential Airbnb hosts decide whether to rent out their unit. The decision to host, however, is more complicated. Hosts have many choices about how to set up their short term vacation rental unit, and each choice may influence the price they can charge. Using Airbnb data from Amdsterdam, we model how the attributes a host can and cannot control about their Airbnb unit influence the amount they charge. Analysis and Interpretation of the model can help future Airbnb hosts anticipate potential revenue and determine the optimal way to set up their short term vacation rental unit.</p>
 </div>
 <div id="background" class="section level2">
 <h2>Background</h2>
@@ -138,7 +139,8 @@ $(document).ready(function () {
 <p>The expected change in log of y with respect to a one-unit increase in x1 holding all other variables at any fixed value</p>
 <ul>
 <li>The results show that most airbnb account settings are significant at the 0.05 level except for bed types and parking.</li>
-<li>The variable that had the strongest effect on the price per night is renting out the entire property, with a <span class="math inline">\(\beta\)</span> of increasing the price per night by $2.24.</li>
+<li>The variable that had the strongest effect on the price per night is renting out the entire property, with a increase in the price per night by 2.24 times when compared to renting out a shared room while controlling for others.</li>
+<li>An interesting conclusion found was that smoking did not seem to have an affect on the price per night as the coeffecient is close to 1.</li>
 </ul>
 <table>
 <thead>
@@ -154,91 +156,91 @@ $(document).ready(function () {
 <tr class="odd">
 <td>Intercept</td>
 <td>2.680</td>
-<td>$14.59</td>
+<td>14.59</td>
 <td>0.092</td>
 <td>&lt; 2e-16</td>
 </tr>
 <tr class="even">
 <td>Host is superhost</td>
 <td>0.070</td>
-<td>$1.07</td>
+<td>1.07</td>
 <td>0.009</td>
 <td>4.86e-14</td>
 </tr>
 <tr class="odd">
 <td>Room type: Private</td>
 <td>0.397</td>
-<td>$1.49</td>
+<td>1.49</td>
 <td>0.008</td>
 <td>&lt; 2e-16</td>
 </tr>
 <tr class="even">
 <td>Room type: Entire Place</td>
 <td>0.806</td>
-<td>$2.24</td>
+<td>2.24</td>
 <td>0.045</td>
 <td>&lt; 2e-16</td>
 </tr>
 <tr class="odd">
 <td>Accomodates</td>
 <td>0.076</td>
-<td>$1.08</td>
+<td>1.08</td>
 <td>0.004</td>
 <td>&lt; 2e-16</td>
 </tr>
 <tr class="even">
 <td># of Beds</td>
 <td>0.006</td>
-<td>$1.01</td>
+<td>1.01</td>
 <td>0.004</td>
 <td>0.0984</td>
 </tr>
 <tr class="odd">
 <td>Bed type: Couch</td>
 <td>0.184</td>
-<td>$1.20</td>
+<td>1.20</td>
 <td>0.112</td>
 <td>0.0997</td>
 </tr>
 <tr class="even">
 <td>Bed type: Real Bed</td>
 <td>0.076</td>
-<td>$1.08</td>
+<td>1.08</td>
 <td>0.076</td>
 <td>0.1208</td>
 </tr>
 <tr class="odd">
 <td>Guest included</td>
 <td>0.015</td>
-<td>$1.02</td>
+<td>1.02</td>
 <td>0.003</td>
 <td>5.75e-07</td>
 </tr>
 <tr class="even">
 <td>Minimum nights</td>
 <td>-0.019</td>
-<td>$0.98</td>
+<td>0.98</td>
 <td>0.002</td>
 <td>&lt; 2e-16</td>
 </tr>
 <tr class="odd">
 <td>Wifi</td>
 <td>0.137</td>
-<td>$1.14</td>
+<td>1.14</td>
 <td>0.020</td>
 <td>2.52e-12</td>
 </tr>
 <tr class="even">
 <td>Parking</td>
 <td>0.019</td>
-<td>$1.02</td>
+<td>1.02</td>
 <td>0.013</td>
 <td>0.1415</td>
 </tr>
 <tr class="odd">
 <td>Smoking</td>
 <td>-0.024</td>
-<td>$0.98</td>
+<td>0.98</td>
 <td>0.009</td>
 <td>0.0109</td>
 </tr>
@@ -247,6 +249,9 @@ $(document).ready(function () {
 </div>
 <div id="discussion" class="section level2">
 <h2>Discussion</h2>
+<p>Given the attributes of an Airbnb unit, we are able to accurately predict the price per night with a $() root mean square error rate on a validation set. Our model is useful in useful in guiding hosts set up their unit; superhost, room type, accomodates, guests included, minimum nights, wifi, and smoking are all significant variables in our model at the 95% confidence level. The model shows the following:</p>
+<p>Becoming a superhost increases the average price per night by seven percent; hosts should attempt to fulfill the requirements of a superhost. As compared to a shared space, a private room raises the price per night by 50%, and an entire place raises the price 120%; depending on the property, this information can be used to optimize the configuration of an Airbnb rental. Each additional person a unit accommodates raises the price by 7.8% on average, so high density units may be worthwhile. Hosts that require a minimum number of nights charge less for their units, so if the work between stays is minimal, the model suggestions that hosts should not impose a minimum nights requirement. Units with wifi charge around 15% more on average; this information can be used by hosts to decide whether to purchase wifi for their unit. Lastly, units that allow smoking charge less per night, so the model does not indicate that hosts should allow this.</p>
+<p>It must be noted that this analysis does not imply that these attributes are the direct cause on price, as the model is based on observational data, not a randomized experiment. Nonetheless, the coefficients of the model provide useful indications for how hosts should set up their Airbnb units. The model can be improved with more data from locations other than Amsterdam, and more variables of rental units. Interaction effects should be considered, as well as nonlinear models. Regardless, a useful model was produced that provides useful insight into Airbnb vacation rentals.</p>
 </div>
 
 
