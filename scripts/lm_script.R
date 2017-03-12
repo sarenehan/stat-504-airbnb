@@ -140,6 +140,11 @@ p + stat_binhex(colour="white") + ggtitle("Residuals vs Fitted values plot") + t
 
 ##variable selection
 step(lm.airbnb)
+
+lm.airbnb <- lm(log(price)~host_is_superhost + neighbourhood_cleansed + 
+                  property_type + relevel(room_type, ref="Shared room") + accommodates + bathrooms + bedrooms + 
+                  beds +  guests_included + minimum_nights + wifi + bed_type + parking + smoke
+                  , data=df.data)
 ##from the output of step, we exclude beds, host_acceptance_rate,review_scores_checkin, review_scores_communication.
 
 # exhaustive variable selection
