@@ -22,7 +22,7 @@ library(ggmap)
 library(ggplot2)
 library(dplyr)
 library(faraway)
-df.data <- read.csv('~/Documents/courses/504/stat-504-airbnb/data/listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
+df.data <- read.csv('~/projects/stat-504-airbnb/data/listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
 
 #Reducing to variables of interests
 df.data <- dplyr::select(df.data, price, host_is_superhost, host_has_profile_pic, host_identity_verified, 
