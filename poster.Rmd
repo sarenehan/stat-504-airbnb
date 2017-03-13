@@ -6,25 +6,16 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## Introduction
-Travelers are increasingly using short term vacation rentals as an alternative to traditional hotels for accomodations. The most popular service for short term vacation rentals is Airbnb, a website that lets anybody rent out their room, apartment, or house. Airbnb's popularity has created a potential revenue source for property owners. Homeowners with a spare bedroom now have the option to rent it out on their desired timeline. Apartment building owners now have the option to rent units to travelers instead of long term tenants. Central to the decision to become an Airbnb host is the expected revenue. Individuals will only list their properties on Airbnb if they expect to make above a certain amount of money. A model that predicts the rental price of a unit given its attributes can help potential Airbnb hosts decide whether to rent out their unit. The decision to host, however, is more complicated. Hosts have many choices about how to set up their short term vacation rental unit, and each choice may influence the price they can charge. Using Airbnb data from Amdsterdam, we model how the attributes a host can and cannot control about their Airbnb unit influence the amount they charge. Analysis and Interpretation of the model can help future Airbnb hosts anticipate potential revenue and determine the optimal way to set up their short term vacation rental unit.
-
-## Background
-
-## Methodology & Analysis
-
-```{r,include=F}
 library(MASS)
 library(ggmap)
 library(ggplot2)
 library(dplyr)
 library(faraway)
 df.data <- read.csv('~/projects/stat-504-airbnb/data/listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
+# df.data <- read.csv(file='D:\\Program File\\Git\\git_projects\\STATS # # 504\\ProjectProposal\\stat-504-airbnb\\data\\listings.csv',header=TRUE,sep=',',stringsAsFactors=FALSE)
 
 #Reducing to variables of interests
+df.map <- dplyr::select(df.data, longitude, latitude, price)
 df.data <- dplyr::select(df.data, price, host_is_superhost, host_has_profile_pic, host_identity_verified, 
                          neighbourhood_cleansed, property_type, room_type, accommodates, bathrooms, bedrooms, beds, bed_type, amenities, guests_included, minimum_nights, number_of_reviews)
 
@@ -102,6 +93,49 @@ nrow(df.data)  # 11304
 # Remove listings with accommodates outliers. 
 df.data <- subset(df.data, !(accommodates > 10 & price < 150))
 nrow(df.data)  # 11295
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+Travelers are increasingly using short term vacation rentals as an alternative to traditional hotels for accomodations. The most popular service for short term vacation rentals is Airbnb, a website that lets anybody rent out their room, apartment, or house. Airbnb's popularity has created a potential revenue source for property owners. Homeowners with a spare bedroom now have the option to rent it out on their desired timeline. Apartment building owners now have the option to rent units to travelers instead of long term tenants. Central to the decision to become an Airbnb host is the expected revenue. Individuals will only list their properties on Airbnb if they expect to make above a certain amount of money. A model that predicts the rental price of a unit given its attributes can help potential Airbnb hosts decide whether to rent out their unit. The decision to host, however, is more complicated. Hosts have many choices about how to set up their short term vacation rental unit, and each choice may influence the price they can charge. Using Airbnb data from Amdsterdam, we model how the attributes a host can and cannot control about their Airbnb unit influence the amount they charge. Analysis and Interpretation of the model can help future Airbnb hosts anticipate potential revenue and determine the optimal way to set up their short term vacation rental unit.
+
+## Background
+* The data for this study was obtained from *insideairbnb* for active listings on 7/4/2016 in Amsterdam, Netherlands. 
+* The data was reduced to 15 variables of interest for 13849 different listings on Airbnb.com.
+
+| Variables         |Type             |Description                                          |
+|-------------------|-----------------|-----------------------------------------------------|
+| Price per night   | Account Setting | The price per night of the listing.                 |
+| Host is superhost | Account Setting | Is the host an Airbnb superhost.                    | 
+| Room type         | Account Setting | The room type of the listing (whole place or room). | 
+| Accomodates       | Account Setting | The number of people the listing accomodates.       | 
+| Profile picture   | Account Setting | Does the host has a profile picture.                |
+| Identity verified | Account Setting | Is the hosts identity verified by Airbnb.           |  
+| Guest included    | Account Setting | The number of guests included in the price.         | 
+| Minimum nights    | Account Setting | Minimum booking nights.                             | 
+| Amenities         | Account Setting | Type of amenities included.                         |
+| Beds              | Control         | The number of beds.                                 | 
+| Bed type          | Control         | The type of beds in the listing.                    |
+| Neighbourhood     | Control         | Neighbourhood the listing is located in.            | 
+| Property type     | Control         | The property type of the listing.                   | 
+| Bathrooms         | Control         | The number of bathrooms.                            | 
+| Bedrooms          | Control         | The number of bedrooms.                             | 
+
+```{r map, echo=FALSE}
+AmsterdamMap <- qmap('amsterdam', zoom = 12)
+AmsterdamMap +
+  stat_density2d(aes(x = longitude, y = latitude, fill=..level.., alpha=..level..), 
+            data = df.map, geom='polygon', na.rm=TRUE) +
+  scale_alpha_continuous(range=c(0.1,0.5), guide=FALSE) + ggtitle("A map of the density of Airbnb listings in Amsterdam") +
+  guides(fill=guide_legend(title="Number of listings"))
+
+```
+
+## Methodology & Analysis
+
+```{r,include=F}
+
 ```
 
 After some data cleaing, we intend to bulid a regression model to predict house price. Our data frame has 17 varialbes. The first is responce and the others are predictors.
@@ -141,7 +175,6 @@ halfnorm(cook) # 100, 595
 ```
 
 ```{r,echo=F,fig.height=3}
-library('MASS')
 boxcox(reg1,lambda = seq(-0.5,0.5,0.01))
 ```
 
@@ -194,7 +227,7 @@ lm.airbnb=lm(log(price)~.,data=df.data[,df.name])
 The expected change in log of y with respect to a one-unit increase in x1 holding all other variables at any fixed value
 
 * The results show that most airbnb account settings are significant at the 0.05 level except for bed types and parking. 
-* The variable that had the strongest effect on the price per night is renting out the entire property, with a increase in the price per night by 2.24 times when compared to renting out a shared room while controlling for others.
+* The variable that had the strongest effect on the price per night is renting out the entire property. This increased the price per night by 2.24 times on average when compared to renting out a shared room while controlling for others.
 * An interesting conclusion found was that smoking did not seem to have an affect on the price per night as the coeffecient is close to 1.
 
 |                          |$\beta$   |exp($\beta$)    | SE    | p-value  |
