@@ -16,7 +16,7 @@ df.data <- read.csv('~/projects/stat-504-airbnb/data/listings.csv',header=TRUE,s
 
 #Reducing to variables of interests
 df.map <- dplyr::select(df.data, longitude, latitude, price)
-df.data <- dplyr::select(df.data, price, host_is_superhost, host_has_profile_pic, host_identity_verified, 
+df.data <- dplyr::select(df.data, price, host_is_superhost, host_has_profile_pic, host_identity_verified,
                          neighbourhood_cleansed, property_type, room_type, accommodates, bathrooms, bedrooms, beds, bed_type, amenities, guests_included, minimum_nights, number_of_reviews)
 
 #clean data
@@ -90,7 +90,7 @@ property_types_to_remove = c(
 df.data = df.data[!df.data$property_type %in% property_types_to_remove,]
 nrow(df.data)  # 11304
 
-# Remove listings with accommodates outliers. 
+# Remove listings with accommodates outliers.
 df.data <- subset(df.data, !(accommodates > 10 & price < 150))
 nrow(df.data)  # 11295
 
@@ -98,34 +98,35 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Introduction
-Travelers are increasingly using short term vacation rentals as an alternative to traditional hotels for accomodations. The most popular service for short term vacation rentals is Airbnb, a website that lets anybody rent out their room, apartment, or house. Airbnb's popularity has created a potential revenue source for property owners. Homeowners with a spare bedroom now have the option to rent it out on their desired timeline. Apartment building owners now have the option to rent units to travelers instead of long term tenants. Central to the decision to become an Airbnb host is the expected revenue. Individuals will only list their properties on Airbnb if they expect to make above a certain amount of money. A model that predicts the rental price of a unit given its attributes can help potential Airbnb hosts decide whether to rent out their unit. The decision whether to host, however, is more complicated. Hosts have many choices about how to set up their short term vacation rental unit, and each choice may influence the price they can charge. Using Airbnb data from Amdsterdam, we model how the attributes a host can and cannot control about their Airbnb unit influence the amount they charge. Analysis and Interpretation of the model can help future Airbnb hosts anticipate potential revenue and determine the optimal way to set up their short term vacation rental unit.
+Travelers are increasingly using short term vacation rentals as an alternative to traditional hotels for accommodations. The most popular service for short term vacation rentals is Airbnb, a website that lets anybody rent out their room, apartment, or house. Airbnb's popularity has created a potential revenue source for property owners. New Airbnb hosts have many choices about how to set up their short term vacation rental unit, and each choice may influence the price they can charge. Using Airbnb data from Amsterdam, we model how the attributes a host can and cannot control about their Airbnb unit influence the amount they charge. Analysis and Interpretation of the model can help future Airbnb hosts anticipate potential revenue and determine the optimal way to set up their short term vacation rental unit.
+
 
 ## Background
-* The data for this study was obtained from *insideairbnb* for active listings on 7/4/2016 in Amsterdam, Netherlands. 
+* The data for this study was obtained from *insideairbnb* for active listings on 7/4/2016 in Amsterdam, Netherlands.
 * The data was reduced to 15 variables of interest for 13849 different listings on Airbnb.com.
 
 | Variables         |Type             |Description                                          |
 |-------------------|-----------------|-----------------------------------------------------|
 | Price per night   | Account Setting | The price per night of the listing.                 |
-| Host is superhost | Account Setting | Is the host an Airbnb superhost.                    | 
-| Room type         | Account Setting | The room type of the listing (whole place or room). | 
-| Accomodates       | Account Setting | The number of people the listing accomodates.       | 
+| Host is superhost | Account Setting | Is the host an Airbnb superhost.                    |
+| Room type         | Account Setting | The room type of the listing (whole place or room). |
+| Accomodates       | Account Setting | The number of people the listing accomodates.       |
 | Profile picture   | Account Setting | Does the host has a profile picture.                |
-| Identity verified | Account Setting | Is the hosts identity verified by Airbnb.           |  
-| Guest included    | Account Setting | The number of guests included in the price.         | 
-| Minimum nights    | Account Setting | Minimum booking nights.                             | 
+| Identity verified | Account Setting | Is the hosts identity verified by Airbnb.           |
+| Guest included    | Account Setting | The number of guests included in the price.         |
+| Minimum nights    | Account Setting | Minimum booking nights.                             |
 | Amenities         | Account Setting | Type of amenities included.                         |
-| Beds              | Control         | The number of beds.                                 | 
+| Beds              | Control         | The number of beds.                                 |
 | Bed type          | Control         | The type of beds in the listing.                    |
-| Neighbourhood     | Control         | Neighbourhood the listing is located in.            | 
-| Property type     | Control         | The property type of the listing.                   | 
-| Bathrooms         | Control         | The number of bathrooms.                            | 
-| Bedrooms          | Control         | The number of bedrooms.                             | 
+| Neighbourhood     | Control         | Neighbourhood the listing is located in.            |
+| Property type     | Control         | The property type of the listing.                   |
+| Bathrooms         | Control         | The number of bathrooms.                            |
+| Bedrooms          | Control         | The number of bedrooms.                             |
 
 ```{r map, echo=FALSE}
 AmsterdamMap <- qmap('amsterdam', zoom = 12)
 AmsterdamMap +
-  stat_density2d(aes(x = longitude, y = latitude, fill=..level.., alpha=..level..), 
+  stat_density2d(aes(x = longitude, y = latitude, fill=..level.., alpha=..level..),
             data = df.map, geom='polygon', na.rm=TRUE) +
   scale_alpha_continuous(range=c(0.1,0.5), guide=FALSE) + ggtitle("A map of the density of Airbnb listings in Amsterdam") +
   guides(fill=guide_legend(title="Number of listings"))
@@ -144,7 +145,7 @@ After some data cleaing, we intend to bulid a regression model to predict house 
 summary(df.data)
 ```
 
-We bulit an original regression model including all predictors and all samples. The residual plot shows there exist some outliers and variance of residuals are not constant. The QQ plot shows our data are not from normal distribution which has no effect on the basis of estimators but influences the tests of significance. Since our rule is to guarantee the high accuracy of prediction, we don't have to pay much attention on the non-normality. 
+We bulit an original regression model including all predictors and all samples. The residual plot shows there exist some outliers and variance of residuals are not constant. The QQ plot shows our data are not from normal distribution which has no effect on the basis of estimators but influences the tests of significance. Since our rule is to guarantee the high accuracy of prediction, we don't have to pay much attention on the non-normality.
 
 ```{r,echo=F}
 reg1=lm(price~.,data=df.data)
@@ -163,7 +164,7 @@ bad_ids = c(487, 5703)
 df.data = df.data[-bad_ids,]
 
 # Remove points with minimum_nights > 15. These dont fall under the category of short term vacation
-# rental. 
+# rental.
 df.data = df.data[df.data$minimum_nights <= 15,]
 nrow(df.data)  # 11223
 
@@ -226,7 +227,7 @@ lm.airbnb=lm(log(price)~.,data=df.data[,df.name])
 ## Results
 The expected change in log of y with respect to a one-unit increase in x1 holding all other variables at any fixed value
 
-* The results show that most airbnb account settings are significant at the 0.05 level except for bed types and parking. 
+* The results show that most airbnb account settings are significant at the 0.05 level except for bed types and parking.
 * The variable that had the strongest effect on the price per night is renting out the entire property. This increased the price per night by 2.24 times on average when compared to renting out a shared room while controlling for others.
 * An interesting conclusion found was that smoking did not seem to have an affect on the price per night as the coeffecient is close to 1.
 
@@ -247,9 +248,8 @@ The expected change in log of y with respect to a one-unit increase in x1 holdin
 | Smoking                 | -0.024 | 0.98        | 0.009 | 0.0109   |
 
 ## Discussion
-Given the attributes of an Airbnb unit, we are able to accurately predict the price per night. Our model is useful in useful in guiding hosts set up their unit; superhost, room type, accomodates, guests included, minimum nights, wifi, and smoking are all significant variables in our model at the 95% confidence level. The model can help hosts determine how to set up their Airbnb rental in the following ways: 
+Given the attributes of an Airbnb unit, we are able to accurately model the price per night. Our model is useful in useful in guiding hosts set up their unit; super host, room type, accommodates, guests included, minimum nights, Wi-Fi, and smoking are all significant variables in our model at the 95% confidence level. The model can help hosts determine how to set up their Airbnb rental unit in the following ways:
 
-The coefficient for room type can help hosts determine how to configure their unit. For example, a host can understand the difference in expected revenue between making their space two separate airbnb rentals, or one private unit. The coefficients for accommodates and guests included can help hosts decide how many beds or sleeping locations to include in their unit. The minimum nights coefficient can help hosts decide whether to require longer stays which will reduce their cleaning costs and time spent managing the unit, but prevent them from charging as much, as the minimum nights coefficient is negative. Hosts should attempt to become superhosts, as the model indicates superhosts can charge higher prices. Hosts can choose whether to include wifi and parking depending on the difference in the cost for those services and the expected additional revenue indicated by the model. Lastly, the model indicates that hosts should not allow smoking.  
+The coefficient for room type can help hosts determine how to configure their unit. For example, a host can understand the difference in expected revenue between making their space two separate Airbnb rentals, or one private unit. The coefficients for accommodates and guests included can help hosts decide how many beds or sleeping locations to include in their unit. The minimum nights coefficient can help hosts decide whether to require longer stays which will reduce their cleaning costs and time spent managing the unit, but prevent them from charging as much, as the minimum nights coefficient is negative. Hosts should attempt to become super hosts, as the model indicates super hosts can charge higher prices. Hosts can choose whether to include Wi-Fi and parking depending on the difference in the cost for those services and the expected additional revenue indicated by the model. Lastly, the model indicates that hosts should not allow smoking.
 
-
-This analysis does not imply that these attributes are the direct cause on price, as the model is based on observational data, not a randomized experiment. Including wifi with the unit will not necessarily raise the value of a unit by 15%, if wifi is correlated with some hidden variable not included in the model. Nonetheless, the coefficients of the model provide useful indications for how hosts should set up their Airbnb units. The model can be improved with more data from locations other than Amsterdam, and more variables of rental units to reduce the impact of hidden variables. Interaction effects should be considered, as well as nonlinear models. Regardless, a useful model was produced that provides useful insight into Airbnb vacation rentals.
+This analysis does not imply that these attributes are the direct cause on price, as the model is based on observational data, not a randomized experiment. Including Wi-Fi with the unit will not necessarily raise the value of a unit by 15%, if Wi-Fi is correlated with some hidden variable not included in the model. Nonetheless, the coefficients of the model provide useful indications for how hosts should set up their Airbnb units. The model can be improved with more data from locations other than Amsterdam, and more features of rental units to reduce the impact of hidden variables. Interaction effects should be considered, as well as nonlinear models. Regardless, a useful model was produced that provides useful insight into Airbnb vacation rentals.
